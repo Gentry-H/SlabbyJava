@@ -4,8 +4,8 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.SubDriveTrain;
 import static frc.robot.Constants.OperatorConstants.*;
 import static frc.robot.Constants.MotorConstants.*;
@@ -13,10 +13,10 @@ import static frc.robot.Constants.MotorConstants.*;
 public class CmdDriveWithController extends CommandBase {
 
   private SubDriveTrain subDriveTrain;
-  private Joystick driverController;
+  private CommandXboxController driverController;
 
   /** Creates a new CmdDriveWithController. */
-  public CmdDriveWithController(SubDriveTrain subDriveTrain, Joystick driverController) {
+  public CmdDriveWithController(SubDriveTrain subDriveTrain, CommandXboxController driverController) {
     this.subDriveTrain = subDriveTrain;
     this.driverController = driverController;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -34,17 +34,17 @@ public class CmdDriveWithController extends CommandBase {
     double speed = 0;
 
     // This sets up the virtual low gear
-    if(driverController.getRawButton(BUTTON_B)) {
+    if(driverController.b().getAsBoolean()) {
       subDriveTrain.setMaxSpeed(VELOCITY_SP_MAX_LL);
     } else {
       subDriveTrain.setMaxSpeed(VELOCITY_SP_MAX_LG);
     }
 
     // Sets the speed based on the driver controller triggers
-    if (driverController.getRawAxis(AXIS_R_TRIG) > 0)  {
-      speed = -1*driverController.getRawAxis(AXIS_R_TRIG);
+    if (driverController.getRightTriggerAxis() > 0)  {
+      speed = -1*driverController.getRightTriggerAxis();
     } else {
-      speed = driverController.getRawAxis(AXIS_L_TRIG);
+      speed = driverController.getLeftTriggerAxis();
     }
 
     // Set the rotation
@@ -52,16 +52,16 @@ public class CmdDriveWithController extends CommandBase {
 
     // Booleans for detecting if we want to move the robot
     boolean isMoveDesired = (speed > 0.02 || speed < -0.02);
-    boolean isTurnDesired = (driverController.getRawAxis(AXIS_LX) > 0.02 || driverController.getRawAxis(AXIS_LX)  < -0.02);
+    boolean isTurnDesired = (driverController.getLeftX() > 0.02 || driverController.getLeftX()  < -0.02);
 
     // is the controller telling us to turn?
     if(isTurnDesired) {
       subDriveTrain.setYawStraightValue(subDriveTrain.getYaw());
 
       if(subDriveTrain.getGear()) {
-        rotation = driverController.getRawAxis(AXIS_LX)*0.7;
+        rotation = driverController.getLeftX()*0.7;
       } else {
-        rotation = driverController.getRawAxis(AXIS_LX)*0.8;
+        rotation = driverController.getLeftX()*0.8;
       }
     } else if(isMoveDesired) {
 
